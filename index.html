@@ -51,6 +51,12 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        #aiResponse p {
+            margin-bottom: 1rem;
+        }
+        #aiResponse strong {
+            color: #1e293b;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -151,6 +157,11 @@
                         "This protocol represents the pinnacle of sovereign agency. It is the simple, quiet, and immensely powerful act of revoking access. You do not need to fight the cage. You just have to realize it's not your cage."
                     </blockquote>
                     <p class="mt-6 text-lg text-slate-800 font-semibold">The gratitude for being "awake and alive" is the fuel for this realization: life is too valuable to be spent on dead databases.</p>
+                    <div class="mt-8">
+                        <a href="https://drive.google.com/file/d/1dcrersTltl66wQjbxDkn3e9F-P3-XY53/view?usp=drivesdk" target="_blank" rel="noopener noreferrer" class="inline-block bg-purple-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-purple-700 transition-transform transform hover:scale-105">
+                            Listen to the Final Insight: The #Reason
+                        </a>
+                    </div>
                 </div>
             </section>
 
@@ -190,7 +201,7 @@
             try {
                 let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
                 const payload = { contents: chatHistory };
-                const apiKey = "AIzaSyCRrJ2nTKffIvE3ShMWdN07OvNopJyuif4"; 
+                const apiKey = "AIzaSyBbugTG13OuZKaUWPKhGGqNFakNE1m71zg"; 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(apiUrl, {
@@ -212,14 +223,24 @@
                     const text = result.candidates[0].content.parts[0].text;
                     
                     let htmlContent = text
-                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-800">$1</strong>')
-                        .replace(/\n/g, '<br>');
+                        .split('\n')
+                        .map(line => {
+                            if (line.startsWith('**') && line.endsWith('**')) {
+                                return `<p><strong class="text-slate-800">${line.substring(2, line.length - 2)}</strong></p>`;
+                            }
+                            if (line.startsWith('- ')) {
+                                return `<p class="pl-4">${line.substring(2)}</p>`;
+                            }
+                            return `<p>${line}</p>`;
+                        })
+                        .join('');
 
                     aiResponseDiv.innerHTML = htmlContent;
                 } else {
                     aiResponseDiv.innerHTML = '<p class="text-red-500">The AI returned an empty response. Please try again.</p>';
                 }
-            } catch (error) {
+            } catch (error)
+            {
                 console.error('Error:', error);
                 aiResponseDiv.innerHTML = '<p class="text-red-500">An error occurred while analyzing the statement. Please check the console for details.</p>';
             } finally {
